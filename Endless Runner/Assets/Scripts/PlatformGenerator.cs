@@ -3,36 +3,55 @@ using System.Collections;
 
 public class PlatformGenerator : MonoBehaviour {
 
-    public GameObject PlatformPrefab;
+    public ObjectPooler[] objectPools;
+    private float[] platformWidths;
+    private int platformSelector;
+
     public Transform generationPoint; 
     
     public float distMin, distMax;
     private float dist;
 
-    private float platformWidth;
+    private float minHeight, maxHeight;
+    public Transform maxHeightPoint;
 
-    private ObjectPooler objectPool;
+    public float maxHeightChange;
+    private float heightChange;
+
 
 	// Use this for initialization
 	void Start () {
-        platformWidth = PlatformPrefab.GetComponent<BoxCollider2D>().size.x;
-        objectPool = GameObject.FindObjectOfType<ObjectPooler>();
+        platformWidths = new float[objectPools.Length];
+
+        for (int i = 0; i < objectPools.Length; ++i)
+        {
+            platformWidths[i] = objectPools[i].pooledObject.GetComponent<BoxCollider2D>().size.x;
+        }
+
+        minHeight = transform.position.y;
+        maxHeight = maxHeightPoint.position.y;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
-        if (this.transform.position.x < generationPoint.position.x)
+        if (transform.position.x < generationPoint.position.x)
         {
-            dist = Mathf.Clamp(Random.value*distMax,distMin,distMax);
-            this.transform.position = new Vector3(transform.position.x + platformWidth + dist, transform.position.y, transform.position.z);
-            GameObject newPlatform = objectPool.GetPooledObject();
+            dist = Random.Range(distMin, distMax);
+            platformSelector = Random.Range(0, objectPools.Length);
 
+            heightChange = transform.position.y + Random.Range(-maxHeightChange, maxHeightChange);
+
+            heightChange = Mathf.Clamp(heightChange, minHeight, maxHeight);
+            
+            transform.position = new Vector3(transform.position.x + platformWidths[platformSelector]/2f + dist, heightChange,transform.position.z);
+
+            GameObject newPlatform = objectPools[platformSelector].GetPooledObject();
             newPlatform.transform.position = transform.position;
             newPlatform.transform.rotation = transform.rotation;
             newPlatform.SetActive(true);
 
-            // Instantiate(PlatformPrefab,transform.position, transform.rotation);
+            transform.position = new Vector3(transform.position.x + platformWidths[platformSelector] / 2f, transform.position.y, transform.position.z);
         }
 	
 	}
