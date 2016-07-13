@@ -4,14 +4,19 @@ using System.Collections;
 public class PlatformGenerator : MonoBehaviour {
 
     public GameObject PlatformPrefab;
-    public Transform generationPoint;
-    public float distanceBetween;
+    public Transform generationPoint; 
+    
+    public float distMin, distMax;
+    private float dist;
 
     private float platformWidth;
+
+    private ObjectPooler objectPool;
 
 	// Use this for initialization
 	void Start () {
         platformWidth = PlatformPrefab.GetComponent<BoxCollider2D>().size.x;
+        objectPool = GameObject.FindObjectOfType<ObjectPooler>();
 	}
 	
 	// Update is called once per frame
@@ -19,8 +24,15 @@ public class PlatformGenerator : MonoBehaviour {
 
         if (this.transform.position.x < generationPoint.position.x)
         {
-            this.transform.position = new Vector3(transform.position.x + platformWidth + distanceBetween, transform.position.y, transform.position.z);
-            Instantiate(PlatformPrefab,transform.position, transform.rotation);
+            dist = Mathf.Clamp(Random.value*distMax,distMin,distMax);
+            this.transform.position = new Vector3(transform.position.x + platformWidth + dist, transform.position.y, transform.position.z);
+            GameObject newPlatform = objectPool.GetPooledObject();
+
+            newPlatform.transform.position = transform.position;
+            newPlatform.transform.rotation = transform.rotation;
+            newPlatform.SetActive(true);
+
+            // Instantiate(PlatformPrefab,transform.position, transform.rotation);
         }
 	
 	}
