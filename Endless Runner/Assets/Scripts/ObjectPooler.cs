@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class ObjectPooler : MonoBehaviour
 {
     public GameObject pooledObject;
-
     public int pooledAmount;
 
     private List<GameObject> pooledObjects;
@@ -34,7 +33,6 @@ public class ObjectPooler : MonoBehaviour
         }
 
         return GetNewPooledObject();
-
     }
 
     private GameObject GetNewPooledObject()
